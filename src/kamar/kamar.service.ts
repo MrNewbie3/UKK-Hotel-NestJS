@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateKamarDto } from './dto/create-kamar.dto';
-import { UpdateKamarDto } from './dto/update-kamar.dto';
+
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
