@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  RESEPSIONIS
+}
+
+enum Status {
+  BARU
+  CHECK_IN
+  CHECK_OUT
+}
+
+model User {
+  id        Int         @id @default(autoincrement())
+  nama      String      @unique
+  foto      String?
+  email     String
+  password  String?
+  role      Role
+  pemesanan Pemesanan[]
+}
+
+model Pemesanan {
+  id               Int                @id @default(autoincrement())
+  nomor            Int
+  nama_pemesan     String
+  email_pemesan    String
+  tgl_pemesanan    DateTime
+  tgl_check_in     DateTime
+  tgl_check_out    DateTime
+  nama_tamu        String
+  jumlah_kamar     Int
+  id_tipe_kamar    Int
+  status           Status
+  user             User?              @relation(fields: [user_id], references: [id])
+  user_id          Int
+  tipe_kamar       Tipe_Kamar         @relation(fields: [id_tipe_kamar], references: [id])
+  detail_pemesanan Detail_Pemesanan[]
+}
+
+model Detail_Pemesanan {
+  id           Int        @id @default(autoincrement())
+  id_pemesanan Int
+  id_kamar     Int
+  tgl_akses    DateTime
+  harga        Int
+  kamar        Kamar?     @relation(fields: [id_kamar], references: [id])
+  pemesanan    Pemesanan? @relation(fields: [id_pemesanan], references: [id])
+}
+
+model Kamar {
+  id               Int                @id @default(autoincrement())
+  nomor            Int                @unique
+  id_tipe_kamar    Int
+  detail_pemesanan Detail_Pemesanan[]
+  tipe_kamar       Tipe_Kamar         @relation(fields: [id_tipe_kamar], references: [id])
+}
+
+model Tipe_Kamar {
+  id        Int         @id @default(autoincrement())
+  nama      String
+  harga     Int
+  deskripsi String
+  foto      String
+  pemesanan Pemesanan[]
+  kamar     Kamar[]
+}
