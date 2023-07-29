@@ -10,6 +10,8 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Request } from 'express';
+import { createUserDto } from './dto/create-user.dto';
+import { updateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -20,21 +22,27 @@ export class UserController {
   }
 
   @Get(':id')
-  getSingle(@Param() id: number) {
+  getSingle(@Param('id') id: number) {
     return this.appService.getSingleUser(id);
   }
 
   @Post()
-  createData(@Req() request: Request, @Body() body: string): Promise<any> {
+  createData(
+    @Req() request: Request,
+    @Body() body: createUserDto,
+  ): Promise<any> {
     return this.appService.postUser(request, body);
   }
 
   @Put(':id')
-  updateData(@Body() body: string, @Param() id: number): Promise<any> {
+  updateData(
+    @Body() body: updateUserDto,
+    @Param('id') id: number,
+  ): Promise<any> {
     return this.appService.updateUser(id, body);
   }
   @Delete(':id')
-  deleteData(@Param() id: number) {
+  deleteData(@Param('id') id: number) {
     return this.appService.deleteUser(id);
   }
 }

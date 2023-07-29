@@ -26,20 +26,20 @@ export class TipeKamarController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tipeKamarService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.tipeKamarService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateTipeKamarDto: UpdateTipeKamarDto,
   ) {
-    return this.tipeKamarService.update(+id, updateTipeKamarDto);
+    return this.tipeKamarService.update(id, updateTipeKamarDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tipeKamarService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.tipeKamarService.remove(id);
   }
 }

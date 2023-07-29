@@ -1,6 +1,8 @@
 import { Body, HttpCode, Injectable, Param, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { createUserDto } from './dto/create-user.dto';
+import { updateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -14,7 +16,10 @@ export class UserService {
     }
   }
 
-  async postUser(@Req() req: Request, @Body() payload): Promise<any> {
+  async postUser(
+    @Req() req: Request,
+    @Body() payload: createUserDto,
+  ): Promise<any> {
     try {
       const isUserExist = await this.prisma.user.findUnique({
         where: {
@@ -24,18 +29,14 @@ export class UserService {
       if (isUserExist) {
         return 'User already exist';
       }
-      const user = await this.prisma.user.create({ data: payload });
-      return user;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-  async getSingleUser(@Param('id') userId: any): Promise<any> {
-    const { id } = userId;
-    try {
-      const user = await this.prisma.user.findMany({
-        where: {
-          id: parseInt(id),
+      const { email, foto, nama, password, role } = payload;
+      const user = await this.prisma.user.create({
+        data: {
+          nama,
+          email,
+          role,
+          password,
+          foto,
         },
       });
       return user;
@@ -43,12 +44,26 @@ export class UserService {
       throw new Error(error);
     }
   }
-  async updateUser(@Param() userId: any, @Body() payload): Promise<any> {
-    const { id } = userId;
+  async getSingleUser(@Param('id') userId: any): Promise<any> {
+    try {
+      const user = await this.prisma.user.findMany({
+        where: {
+          id: parseInt(userId),
+        },
+      });
+      return user;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async updateUser(
+    @Param() userId: any,
+    @Body() payload: updateUserDto,
+  ): Promise<any> {
     try {
       const user = await this.prisma.user.update({
         where: {
-          id: parseInt(id),
+          id: parseInt(userId),
         },
         data: payload,
       });
@@ -58,11 +73,10 @@ export class UserService {
     }
   }
   async deleteUser(@Param() userId: any): Promise<any> {
-    const { id } = userId;
     try {
       const user = await this.prisma.user.delete({
         where: {
-          id: parseInt(id),
+          id: parseInt(userId),
         },
       });
       return user;
