@@ -11,11 +11,11 @@ import { KamarModule } from './kamar/kamar.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    UserModule,
-    TransaksiModule,
-    PrismaModule,
     DetailPemesananModule,
     KamarModule,
+    PrismaModule,
+    TransaksiModule,
+    UserModule,
   ],
 })
 export class AppModule {}

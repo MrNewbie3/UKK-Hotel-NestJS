@@ -1,26 +1,68 @@
 import { Injectable } from '@nestjs/common';
 import { CreateKamarDto } from './dto/create-kamar.dto';
 import { UpdateKamarDto } from './dto/update-kamar.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class KamarService {
-  create(createKamarDto: CreateKamarDto) {
-    return 'This action adds a new kamar';
+  constructor(private prismaService: PrismaService) {}
+  async create(createKamarDto: any): Promise<any> {
+    try {
+      const room = await this.prismaService.kamar.create({
+        data: createKamarDto,
+      });
+      return room;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
-  findAll() {
-    return `This action returns all kamar`;
+  async findAll(): Promise<any[]> {
+    try {
+      const room = await this.prismaService.kamar.findMany();
+      return room;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} kamar`;
+  async findOne(id: number): Promise<any> {
+    try {
+      const room = await this.prismaService.kamar.findMany({
+        where: {
+          id: Number(id),
+        },
+      });
+      return room;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
-  update(id: number, updateKamarDto: UpdateKamarDto) {
-    return `This action updates a #${id} kamar`;
+  async update(id: number, updateKamarDto: any): Promise<any> {
+    try {
+      const room = await this.prismaService.kamar.update({
+        where: {
+          id: Number(id),
+        },
+        data: updateKamarDto,
+      });
+      return room;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} kamar`;
+  async remove(id: number): Promise<any> {
+    try {
+      const room = await this.prismaService.kamar.delete({
+        where: {
+          id: Number(id),
+        },
+      });
+      return room;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 }
