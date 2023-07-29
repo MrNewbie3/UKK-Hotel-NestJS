@@ -5,6 +5,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { TransaksiModule } from './transaksi/transaksi.module';
 import { DetailPemesananModule } from './detail_pemesanan/detail_pemesanan.module';
 import { KamarModule } from './kamar/kamar.module';
+import { TipeKamarModule } from './tipe_kamar/tipe_kamar.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { KamarModule } from './kamar/kamar.module';
     PrismaModule,
     TransaksiModule,
     UserModule,
+    TipeKamarModule,
   ],
 })
 export class AppModule {}
