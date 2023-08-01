@@ -1,9 +1,18 @@
-import { Body, HttpCode, Injectable, Param, Req } from '@nestjs/common';
-import { Request } from 'express';
+import {
+  Body,
+  ConflictException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+  Param,
+  Req,
+  Res,
+} from '@nestjs/common';
+import { Request, Response } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { createUserDto } from './dto/create-user.dto';
 import { updateUserDto } from './dto/update-user.dto';
-
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
@@ -18,6 +27,7 @@ export class UserService {
 
   async postUser(
     @Req() req: Request,
+    @Res() res: Response,
     @Body() payload: createUserDto,
   ): Promise<any> {
     try {
@@ -27,9 +37,11 @@ export class UserService {
         },
       });
       if (isUserExist) {
-        return 'User already exist';
+        return res.status(HttpStatus.CONFLICT).send(new ConflictException());
       }
-      const { email, foto, nama, password, role } = payload;
+
+      const { email, foto, nama, role } = payload;
+      const password = await bcrypt.hash(payload.password, 20);
       const user = await this.prisma.user.create({
         data: {
           nama,
@@ -39,18 +51,19 @@ export class UserService {
           foto,
         },
       });
-      return user;
+      return res.status(HttpStatus.CREATED).send(user);
     } catch (error) {
       throw new Error(error);
     }
   }
   async getSingleUser(@Param('id') userId: any): Promise<any> {
     try {
-      const user = await this.prisma.user.findMany({
+      const user = await this.prisma.user.findFirst({
         where: {
           id: parseInt(userId),
         },
       });
+      delete user.password;
       return user;
     } catch (error) {
       throw new Error(error);
@@ -58,27 +71,78 @@ export class UserService {
   }
   async updateUser(
     @Param() userId: any,
+    @Res() response: Response,
     @Body() payload: updateUserDto,
   ): Promise<any> {
     try {
+      const findUser = await this.prisma.user.findMany({
+        where: {
+          id: Number(userId),
+        },
+      });
+      if (findUser.length < 1) {
+        return response
+          .status(HttpStatus.NOT_FOUND)
+          .send(new NotFoundException());
+      }
+      const validation = await this.prisma.user.findUnique({
+        where: { nama: payload.nama },
+      });
+      if (validation) {
+        return response
+          .status(HttpStatus.CONFLICT)
+          .send(new ConflictException());
+      }
       const user = await this.prisma.user.update({
         where: {
           id: parseInt(userId),
         },
         data: payload,
       });
+      delete user.password;
       return user;
     } catch (error) {
       throw new Error(error);
     }
   }
-  async deleteUser(@Param() userId: any): Promise<any> {
+  async deleteUser(
+    @Res() res: Response,
+    @Param('id') userId: any,
+  ): Promise<any> {
     try {
-      const user = await this.prisma.user.delete({
+      const getUser = await this.prisma.user.findMany({
         where: {
-          id: parseInt(userId),
+          id: Number(userId),
         },
       });
+      if (getUser.length < 1) {
+        return res.status(HttpStatus.NOT_FOUND).send(new NotFoundException());
+      }
+      const user = await this.prisma.user.delete({
+        where: {
+          id: Number(userId),
+        },
+      });
+      delete user.password;
+      return res.status(HttpStatus.OK).send(user);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async login(payload: updateUserDto, res: Response): Promise<any> {
+    try {
+      const validation = await this.prisma.user.findMany({
+        where: {
+          nama: payload.nama,
+        },
+      });
+      if (validation.length < 1) {
+        return res.status(HttpStatus.NOT_FOUND).send(new NotFoundException());
+      }
+      const user = await this.prisma.user.findFirst({
+        where: { nama: payload.nama },
+      });
+      delete user.password;
       return user;
     } catch (error) {
       throw new Error(error);

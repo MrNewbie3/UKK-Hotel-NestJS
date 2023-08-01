@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { Response } from 'express';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -38,8 +39,16 @@ export class KamarService {
     }
   }
 
-  async update(id: number, updateKamarDto: any): Promise<any> {
+  async update(id: number, updateKamarDto: any, res: Response): Promise<any> {
     try {
+      const isRoomExist = await this.prismaService.kamar.findMany({
+        where: {
+          id: Number(id),
+        },
+      });
+      if (isRoomExist.length === 0) {
+        return res.status(HttpStatus.NOT_FOUND).send(new NotFoundException());
+      }
       const room = await this.prismaService.kamar.update({
         where: {
           id: Number(id),
@@ -52,8 +61,16 @@ export class KamarService {
     }
   }
 
-  async remove(id: number): Promise<any> {
+  async remove(id: number, res: Response): Promise<any> {
     try {
+      const isRoomExist = await this.prismaService.kamar.findMany({
+        where: {
+          id: Number(id),
+        },
+      });
+      if (isRoomExist.length === 0) {
+        return res.status(HttpStatus.NOT_FOUND).send(new NotFoundException());
+      }
       const room = await this.prismaService.kamar.delete({
         where: {
           id: Number(id),

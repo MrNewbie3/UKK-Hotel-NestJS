@@ -6,10 +6,12 @@ import {
   Patch,
   Param,
   Delete,
+  Res,
 } from '@nestjs/common';
 import { TipeKamarService } from './tipe_kamar.service';
 import { CreateTipeKamarDto } from './dto/create-tipe_kamar.dto';
 import { UpdateTipeKamarDto } from './dto/update-tipe_kamar.dto';
+import { Response } from 'express';
 
 @Controller('types')
 export class TipeKamarController {
@@ -32,14 +34,15 @@ export class TipeKamarController {
 
   @Patch(':id')
   update(
-    @Param('id') id: number,
     @Body() updateTipeKamarDto: UpdateTipeKamarDto,
+    @Param('id') id: number,
+    @Res() res: Response,
   ) {
-    return this.tipeKamarService.update(id, updateTipeKamarDto);
+    return this.tipeKamarService.update(id, updateTipeKamarDto, res);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.tipeKamarService.remove(id);
+  remove(@Param('id') id: number, @Res() res: Response) {
+    return this.tipeKamarService.remove(id, res);
   }
 }

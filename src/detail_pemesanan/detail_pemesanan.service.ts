@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateDetailPemesananDto } from './dto/update-detail_pemesanan.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Response } from 'express';
 
 @Injectable()
 export class DetailPemesananService {
@@ -26,11 +27,10 @@ export class DetailPemesananService {
   }
 
   async findOne(detailId: any): Promise<any> {
-    const { id } = detailId;
     try {
-      const details = await this.prismaService.pemesanan.findMany({
+      const details = await this.prismaService.detail_Pemesanan.findMany({
         where: {
-          id: Number(id),
+          id: Number(detailId),
         },
       });
       return details;
@@ -42,12 +42,20 @@ export class DetailPemesananService {
   async update(
     detailId: any,
     updateDetailPemesananDto: UpdateDetailPemesananDto,
+    res: Response,
   ): Promise<any> {
-    const { id } = detailId;
     try {
-      const detail = await this.prismaService.pemesanan.update({
+      const isTransaction = await this.prismaService.detail_Pemesanan.findMany({
         where: {
-          id: Number(id),
+          id: Number(detailId),
+        },
+      });
+      if (isTransaction.length < 1) {
+        return res.status(HttpStatus.NOT_FOUND).send(new NotFoundException());
+      }
+      const detail = await this.prismaService.detail_Pemesanan.update({
+        where: {
+          id: Number(detailId),
         },
         data: updateDetailPemesananDto,
       });
@@ -57,12 +65,19 @@ export class DetailPemesananService {
     }
   }
 
-  async remove(detailId: any): Promise<any> {
-    const { id } = detailId;
+  async remove(detailId: any, res: Response): Promise<any> {
     try {
+      const isTransaction = await this.prismaService.detail_Pemesanan.findMany({
+        where: {
+          id: Number(detailId),
+        },
+      });
+      if (isTransaction.length < 1) {
+        return res.status(HttpStatus.NOT_FOUND).send(new NotFoundException());
+      }
       const detail = await this.prismaService.detail_Pemesanan.delete({
         where: {
-          id: Number(id),
+          id: Number(detailId),
         },
       });
       return detail;

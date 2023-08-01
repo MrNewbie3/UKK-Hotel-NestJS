@@ -12,7 +12,6 @@ export class createUserDto {
   nama: string;
 
   @IsString()
-  @IsNotEmpty()
   foto: string;
 
   @IsString()

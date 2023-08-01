@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateTransaksiDto } from './dto/update-transaksi.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Response } from 'express';
 
 @Injectable()
 export class TransaksiService {
@@ -39,9 +40,20 @@ export class TransaksiService {
 
   async updateTransaction(
     transactionId: any,
+    response: Response,
     updateTransaksiDto: UpdateTransaksiDto,
   ): Promise<any> {
     try {
+      const isTransactionExist = await this.prismaService.pemesanan.findMany({
+        where: {
+          id: Number(transactionId),
+        },
+      });
+      if (isTransactionExist.length < 1) {
+        return response
+          .status(HttpStatus.NOT_FOUND)
+          .send(new NotFoundException());
+      }
       const transaction = await this.prismaService.pemesanan.update({
         where: {
           id: Number(transactionId),
@@ -54,8 +66,16 @@ export class TransaksiService {
     }
   }
 
-  async removeTransaction(transactionId: any): Promise<any> {
+  async removeTransaction(transactionId: any, res: Response): Promise<any> {
     try {
+      const isExist = await this.prismaService.pemesanan.findMany({
+        where: {
+          id: Number(transactionId),
+        },
+      });
+      if (isExist.length) {
+        return res.status(HttpStatus.NOT_FOUND).send(new NotFoundException());
+      }
       const transaction = await this.prismaService.pemesanan.delete({
         where: {
           id: Number(transactionId),

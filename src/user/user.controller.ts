@@ -7,9 +7,10 @@ import {
   Post,
   Put,
   Req,
+  Res,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { createUserDto } from './dto/create-user.dto';
 import { updateUserDto } from './dto/update-user.dto';
 
@@ -29,20 +30,22 @@ export class UserController {
   @Post()
   createData(
     @Req() request: Request,
+    @Res() response: Response,
     @Body() body: createUserDto,
   ): Promise<any> {
-    return this.appService.postUser(request, body);
+    return this.appService.postUser(request, response, body);
   }
 
   @Put(':id')
   updateData(
     @Body() body: updateUserDto,
+    @Res() res: Response,
     @Param('id') id: number,
   ): Promise<any> {
-    return this.appService.updateUser(id, body);
+    return this.appService.updateUser(id, res, body);
   }
   @Delete(':id')
-  deleteData(@Param('id') id: number) {
-    return this.appService.deleteUser(id);
+  deleteData(@Param('id') id: number, @Res() response: Response) {
+    return this.appService.deleteUser(response, id);
   }
 }

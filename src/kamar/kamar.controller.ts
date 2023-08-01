@@ -6,10 +6,12 @@ import {
   Patch,
   Param,
   Delete,
+  Res,
 } from '@nestjs/common';
 import { KamarService } from './kamar.service';
 import { CreateKamarDto } from './dto/create-kamar.dto';
 import { UpdateKamarDto } from './dto/update-kamar.dto';
+import { Response, response } from 'express';
 
 @Controller('kamar')
 export class KamarController {
@@ -26,17 +28,21 @@ export class KamarController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.kamarService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.kamarService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateKamarDto: UpdateKamarDto) {
-    return this.kamarService.update(+id, updateKamarDto);
+  update(
+    @Param('id') id: number,
+    @Body() updateKamarDto: UpdateKamarDto,
+    @Res() response: Response,
+  ) {
+    return this.kamarService.update(id, updateKamarDto, response);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.kamarService.remove(+id);
+  remove(@Param('id') id: number, @Res() response: Response) {
+    return this.kamarService.remove(id, response);
   }
 }
