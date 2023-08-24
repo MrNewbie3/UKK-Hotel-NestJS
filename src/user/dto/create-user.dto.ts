@@ -2,6 +2,7 @@ import { Role } from '@prisma/client';
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsStrongPassword,
 } from 'class-validator';
@@ -11,6 +12,7 @@ export class createUserDto {
   @IsNotEmpty()
   nama: string;
 
+  @IsOptional()
   @IsString()
   foto: string;
 

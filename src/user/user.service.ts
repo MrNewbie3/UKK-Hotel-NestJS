@@ -3,23 +3,31 @@ import {
   ConflictException,
   HttpStatus,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   Param,
   Req,
   Res,
+  UploadedFile,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Request, Response, response } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { createUserDto } from './dto/create-user.dto';
 import { updateUserDto } from './dto/update-user.dto';
-import * as bcrypt from 'bcrypt';
+import * as argon2 from 'argon2';
+import { ImageKitService } from 'src/service/imagekit_service';
+import { HelperService } from 'src/helper/helper.service';
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
-  async getUser(): Promise<any[]> {
+  constructor(
+    private prisma: PrismaService,
+    private readonly imageUpload: ImageKitService,
+    private readonly helper: HelperService,
+  ) {}
+  async getUser(response: Response): Promise<Response<any[]>> {
     try {
       const user = await this.prisma.user.findMany();
-      return user;
+      return this.helper.successWrapper(response, user);
     } catch (error) {
       throw new Error(error);
     }
@@ -27,8 +35,9 @@ export class UserService {
 
   async postUser(
     @Req() req: Request,
-    @Res() res: Response,
+    @Res() response: Response,
     @Body() payload: createUserDto,
+    @UploadedFile() foto: Buffer,
   ): Promise<any> {
     try {
       const isUserExist = await this.prisma.user.findUnique({
@@ -36,27 +45,45 @@ export class UserService {
           nama: payload.nama,
         },
       });
-      if (isUserExist) {
-        return res.status(HttpStatus.CONFLICT).send(new ConflictException());
-      }
 
-      const { email, foto, nama, role } = payload;
-      const password = await bcrypt.hash(payload.password, 20);
+      if (isUserExist) {
+        delete isUserExist.password;
+        return this.helper.conflictWrapper(response, isUserExist);
+      }
+      let uploadedImage = 'undefined';
+      if (foto && !isUserExist) {
+        const upload = await this.imageUpload.uploadFiles(
+          foto,
+          new Date() + '_' + payload.nama + '_photo.jpg',
+        );
+        if (!upload) {
+          return this.helper.internalServerErrorWrapper(response, upload);
+        }
+        uploadedImage = upload;
+      }
+      const { email, nama, role } = payload;
+
+      const password = await argon2.hash(payload.password);
+
       const user = await this.prisma.user.create({
         data: {
           nama,
           email,
           role,
           password,
-          foto,
+          foto: uploadedImage,
         },
       });
-      return res.status(HttpStatus.CREATED).send(user);
+      delete user.password;
+      return this.helper.createdWrapper(response, user);
     } catch (error) {
       throw new Error(error);
     }
   }
-  async getSingleUser(@Param('id') userId: any): Promise<any> {
+  async getSingleUser(
+    @Param('id') userId: any,
+    response: Response,
+  ): Promise<Response<any>> {
     try {
       const user = await this.prisma.user.findFirst({
         where: {
@@ -64,7 +91,7 @@ export class UserService {
         },
       });
       delete user.password;
-      return user;
+      return this.helper.successWrapper(response, user);
     } catch (error) {
       throw new Error(error);
     }
@@ -73,7 +100,10 @@ export class UserService {
     @Param() userId: any,
     @Res() response: Response,
     @Body() payload: updateUserDto,
-  ): Promise<any> {
+    @UploadedFile() foto: Buffer,
+  ): Promise<Response<any>> {
+    let data = payload;
+
     try {
       const findUser = await this.prisma.user.findMany({
         where: {
@@ -81,34 +111,40 @@ export class UserService {
         },
       });
       if (findUser.length < 1) {
-        return response
-          .status(HttpStatus.NOT_FOUND)
-          .send(new NotFoundException());
+        return this.helper.notFoundWrapper(response, data);
       }
       const validation = await this.prisma.user.findUnique({
         where: { nama: payload.nama },
       });
-      if (validation) {
-        return response
-          .status(HttpStatus.CONFLICT)
-          .send(new ConflictException());
+      if (validation && findUser[0].id != userId) {
+        return this.helper.conflictWrapper(response, data.nama);
+      }
+      if (foto) {
+        const upload = await this.imageUpload.uploadFiles(
+          foto,
+          new Date() + '_' + payload.nama + '_photo.jpg',
+        );
+        if (!upload) {
+          return this.helper.internalServerErrorWrapper(response, upload);
+        }
+        data = { ...payload, foto: upload };
       }
       const user = await this.prisma.user.update({
         where: {
           id: parseInt(userId),
         },
-        data: payload,
+        data: data,
       });
       delete user.password;
-      return user;
+      return this.helper.successWrapper(response, user);
     } catch (error) {
       throw new Error(error);
     }
   }
   async deleteUser(
-    @Res() res: Response,
+    @Res() response: Response,
     @Param('id') userId: any,
-  ): Promise<any> {
+  ): Promise<Response<any>> {
     try {
       const getUser = await this.prisma.user.findMany({
         where: {
@@ -116,7 +152,7 @@ export class UserService {
         },
       });
       if (getUser.length < 1) {
-        return res.status(HttpStatus.NOT_FOUND).send(new NotFoundException());
+        return this.helper.notFoundWrapper(response, { userId });
       }
       const user = await this.prisma.user.delete({
         where: {
@@ -124,26 +160,7 @@ export class UserService {
         },
       });
       delete user.password;
-      return res.status(HttpStatus.OK).send(user);
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-  async login(payload: updateUserDto, res: Response): Promise<any> {
-    try {
-      const validation = await this.prisma.user.findMany({
-        where: {
-          nama: payload.nama,
-        },
-      });
-      if (validation.length < 1) {
-        return res.status(HttpStatus.NOT_FOUND).send(new NotFoundException());
-      }
-      const user = await this.prisma.user.findFirst({
-        where: { nama: payload.nama },
-      });
-      delete user.password;
-      return user;
+      return this.helper.successWrapper(response, user);
     } catch (error) {
       throw new Error(error);
     }
