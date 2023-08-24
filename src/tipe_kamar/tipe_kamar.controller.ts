@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Res,
+  UploadedFile,
 } from '@nestjs/common';
 import { TipeKamarService } from './tipe_kamar.service';
 import { CreateTipeKamarDto } from './dto/create-tipe_kamar.dto';
@@ -18,8 +19,12 @@ export class TipeKamarController {
   constructor(private readonly tipeKamarService: TipeKamarService) {}
 
   @Post()
-  create(@Body() createTipeKamarDto: CreateTipeKamarDto) {
-    return this.tipeKamarService.create(createTipeKamarDto);
+  create(
+    @Body() createTipeKamarDto: CreateTipeKamarDto,
+    @UploadedFile() foto: Buffer,
+    @Res() response: Response,
+  ) {
+    return this.tipeKamarService.create(createTipeKamarDto, foto, response);
   }
 
   @Get()
@@ -37,8 +42,9 @@ export class TipeKamarController {
     @Body() updateTipeKamarDto: UpdateTipeKamarDto,
     @Param('id') id: number,
     @Res() res: Response,
+    @UploadedFile() foto: Buffer,
   ) {
-    return this.tipeKamarService.update(id, updateTipeKamarDto, res);
+    return this.tipeKamarService.update(id, updateTipeKamarDto, res, foto);
   }
 
   @Delete(':id')

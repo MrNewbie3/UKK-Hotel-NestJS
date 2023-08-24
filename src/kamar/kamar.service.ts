@@ -2,10 +2,15 @@ import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Response } from 'express';
 
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UpdateKamarDto } from './dto/update-kamar.dto';
+import { HelperService } from 'src/helper/helper.service';
 
 @Injectable()
 export class KamarService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private readonly helper: HelperService,
+  ) {}
   async create(createKamarDto: any): Promise<any> {
     try {
       const room = await this.prismaService.kamar.create({
@@ -17,10 +22,10 @@ export class KamarService {
     }
   }
 
-  async findAll(): Promise<any[]> {
+  async findAll(response: Response): Promise<Response<any>> {
     try {
       const room = await this.prismaService.kamar.findMany();
-      return room;
+      return this.helper.successWrapper(response, room);
     } catch (error) {
       throw new Error(error);
     }
@@ -39,7 +44,11 @@ export class KamarService {
     }
   }
 
-  async update(id: number, updateKamarDto: any, res: Response): Promise<any> {
+  async update(
+    id: number,
+    updateKamarDto: UpdateKamarDto,
+    res: Response,
+  ): Promise<any> {
     try {
       const isRoomExist = await this.prismaService.kamar.findMany({
         where: {
