@@ -12,7 +12,7 @@ import {
 import { KamarService } from './kamar.service';
 import { CreateKamarDto } from './dto/create-kamar.dto';
 import { UpdateKamarDto } from './dto/update-kamar.dto';
-import { Response } from 'express';
+import { Response, response } from 'express';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Roles } from 'src/decorator/roles.decorator';
 import { Role } from '@prisma/client';
@@ -26,8 +26,8 @@ export class KamarController {
   constructor(private readonly kamarService: KamarService) {}
 
   @Post()
-  create(@Body() createKamarDto: CreateKamarDto) {
-    return this.kamarService.create(createKamarDto);
+  create(@Body() createKamarDto: CreateKamarDto, @Res() response: Response) {
+    return this.kamarService.create(createKamarDto, response);
   }
 
   @Get()
@@ -36,8 +36,8 @@ export class KamarController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.kamarService.findOne(id);
+  findOne(@Param('id') id: number, @Res() response: Response) {
+    return this.kamarService.findOne(id, response);
   }
 
   @Patch(':id')

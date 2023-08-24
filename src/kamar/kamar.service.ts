@@ -11,13 +11,14 @@ export class KamarService {
     private prismaService: PrismaService,
     private readonly helper: HelperService,
   ) {}
-  async create(createKamarDto: any): Promise<any> {
+  async create(createKamarDto: any, response: Response): Promise<any> {
     try {
       const room = await this.prismaService.kamar.create({
         data: createKamarDto,
       });
-      return room;
+      return this.helper.createdWrapper(response, room);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
@@ -27,19 +28,21 @@ export class KamarService {
       const room = await this.prismaService.kamar.findMany();
       return this.helper.successWrapper(response, room);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
 
-  async findOne(id: number): Promise<any> {
+  async findOne(id: number, response: Response): Promise<any> {
     try {
       const room = await this.prismaService.kamar.findMany({
         where: {
           id: Number(id),
         },
       });
-      return room;
+      return this.helper.successWrapper(response, room);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
@@ -47,7 +50,7 @@ export class KamarService {
   async update(
     id: number,
     updateKamarDto: UpdateKamarDto,
-    res: Response,
+    response: Response,
   ): Promise<any> {
     try {
       const isRoomExist = await this.prismaService.kamar.findMany({
@@ -56,7 +59,7 @@ export class KamarService {
         },
       });
       if (isRoomExist.length === 0) {
-        return res.status(HttpStatus.NOT_FOUND).send(new NotFoundException());
+        return this.helper.notFoundWrapper(response, { id });
       }
       const room = await this.prismaService.kamar.update({
         where: {
@@ -64,13 +67,14 @@ export class KamarService {
         },
         data: updateKamarDto,
       });
-      return room;
+      return this.helper.successWrapper(response, room);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
 
-  async remove(id: number, res: Response): Promise<any> {
+  async remove(id: number, response: Response): Promise<any> {
     try {
       const isRoomExist = await this.prismaService.kamar.findMany({
         where: {
@@ -78,15 +82,16 @@ export class KamarService {
         },
       });
       if (isRoomExist.length === 0) {
-        return res.status(HttpStatus.NOT_FOUND).send(new NotFoundException());
+        return this.helper.notFoundWrapper(response, { id });
       }
       const room = await this.prismaService.kamar.delete({
         where: {
           id: Number(id),
         },
       });
-      return room;
+      return this.helper.successWrapper(response, room);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }

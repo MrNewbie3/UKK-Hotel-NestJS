@@ -1,20 +1,17 @@
-import {
-  HttpStatus,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTipeKamarDto } from './dto/create-tipe_kamar.dto';
 import { ImageKitService } from 'src/service/imagekit_service';
 import { UpdateTipeKamarDto } from './dto/update-tipe_kamar.dto';
+import { HelperService } from 'src/helper/helper.service';
 
 @Injectable()
 export class TipeKamarService {
   constructor(
     private prismaService: PrismaService,
     private readonly imageService: ImageKitService,
+    private readonly helper: HelperService,
   ) {}
   async create(
     createTipeKamarDto: CreateTipeKamarDto,
@@ -28,40 +25,41 @@ export class TipeKamarService {
         `${createTipeKamarDto.nama}_${new Date()}.jpg`,
       );
       if (!uploadImage) {
-        return response
-          .status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .send(new InternalServerErrorException());
+        return this.helper.internalServerErrorWrapper(response, uploadImage);
       }
       payload = { ...createTipeKamarDto, foto: uploadImage };
     }
     try {
-      const RoomTypes = await this.prismaService.tipe_Kamar.create({
+      const roomTypes = await this.prismaService.tipe_Kamar.create({
         data: payload,
       });
-      return RoomTypes;
+      return this.helper.createdWrapper(response, roomTypes);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
 
-  async findAll(): Promise<any> {
+  async findAll(response: Response): Promise<any> {
     try {
-      const RoomTypes = await this.prismaService.tipe_Kamar.findMany();
-      return RoomTypes;
+      const roomTypes = await this.prismaService.tipe_Kamar.findMany();
+      return this.helper.successWrapper(response, roomTypes);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
 
-  async findOne(id: number): Promise<any> {
+  async findOne(id: number, response: Response): Promise<any> {
     try {
-      const RoomTypes = await this.prismaService.tipe_Kamar.findMany({
+      const roomTypes = await this.prismaService.tipe_Kamar.findMany({
         where: {
           id: Number(id),
         },
       });
-      return RoomTypes;
+      return this.helper.successWrapper(response, roomTypes);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
@@ -69,7 +67,7 @@ export class TipeKamarService {
   async update(
     id: number,
     updateTipeKamarDto: UpdateTipeKamarDto,
-    res: Response,
+    response: Response,
     foto: Buffer,
   ): Promise<any> {
     let payload = updateTipeKamarDto;
@@ -80,7 +78,7 @@ export class TipeKamarService {
         },
       });
       if (isRoomExist.length < 1) {
-        return res.status(HttpStatus.NOT_FOUND).send(new NotFoundException());
+        return this.helper.notFoundWrapper(response, { id });
       }
       if (foto) {
         const updateImage = await this.imageService.uploadFiles(
@@ -88,25 +86,24 @@ export class TipeKamarService {
           `${updateTipeKamarDto.nama}_${new Date()}.jpg`,
         );
         if (!updateImage) {
-          return res
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .send(new InternalServerErrorException());
+          return this.helper.internalServerErrorWrapper(response, updateImage);
         }
         payload = { ...updateTipeKamarDto, foto: updateImage };
       }
-      const RoomTypes = await this.prismaService.tipe_Kamar.update({
+      const roomTypes = await this.prismaService.tipe_Kamar.update({
         where: {
           id: Number(id),
         },
         data: payload,
       });
-      return RoomTypes;
+      return this.helper.successWrapper(response, roomTypes);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
 
-  async remove(id: number, res: Response): Promise<any> {
+  async remove(id: number, response: Response): Promise<any> {
     try {
       const isRoomExist = await this.prismaService.kamar.findMany({
         where: {
@@ -114,15 +111,16 @@ export class TipeKamarService {
         },
       });
       if (isRoomExist.length < 1) {
-        return res.status(HttpStatus.NOT_FOUND).send(new NotFoundException());
+        return this.helper.notFoundWrapper(response, { id });
       }
-      const RoomTypes = await this.prismaService.tipe_Kamar.delete({
+      const roomTypes = await this.prismaService.tipe_Kamar.delete({
         where: {
           id: Number(id),
         },
       });
-      return RoomTypes;
+      return this.helper.successWrapper(response, roomTypes);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }

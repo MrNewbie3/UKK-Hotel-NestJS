@@ -2,39 +2,49 @@ import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateDetailPemesananDto } from './dto/update-detail_pemesanan.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Response } from 'express';
+import { HelperService } from 'src/helper/helper.service';
 
 @Injectable()
 export class DetailPemesananService {
-  constructor(private prismaService: PrismaService) {}
-  async create(createDetailPemesananDto: any): Promise<any> {
+  constructor(
+    private prismaService: PrismaService,
+    private readonly helper: HelperService,
+  ) {}
+  async create(
+    createDetailPemesananDto: any,
+    response: Response,
+  ): Promise<Response<any>> {
     try {
       const details = await this.prismaService.detail_Pemesanan.create({
         data: createDetailPemesananDto,
       });
-      return details;
+      return this.helper.createdWrapper(response, details);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
 
-  async findAll(): Promise<any[]> {
+  async findAll(response: Response): Promise<Response<any[]>> {
     try {
       const details = await this.prismaService.detail_Pemesanan.findMany();
-      return details;
+      return this.helper.successWrapper(response, details);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
 
-  async findOne(detailId: any): Promise<any> {
+  async findOne(detailId: any, response: Response): Promise<any> {
     try {
       const details = await this.prismaService.detail_Pemesanan.findMany({
         where: {
           id: Number(detailId),
         },
       });
-      return details;
+      return this.helper.successWrapper(response, details);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
@@ -42,7 +52,7 @@ export class DetailPemesananService {
   async update(
     detailId: any,
     updateDetailPemesananDto: UpdateDetailPemesananDto,
-    res: Response,
+    response: Response,
   ): Promise<any> {
     try {
       const isTransaction = await this.prismaService.detail_Pemesanan.findMany({
@@ -51,7 +61,7 @@ export class DetailPemesananService {
         },
       });
       if (isTransaction.length < 1) {
-        return res.status(HttpStatus.NOT_FOUND).send(new NotFoundException());
+        return this.helper.notFoundWrapper(response, { detailId });
       }
       const detail = await this.prismaService.detail_Pemesanan.update({
         where: {
@@ -59,13 +69,14 @@ export class DetailPemesananService {
         },
         data: updateDetailPemesananDto,
       });
-      return detail;
+      return this.helper.successWrapper(response, detail);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
 
-  async remove(detailId: any, res: Response): Promise<any> {
+  async remove(detailId: any, response: Response): Promise<any> {
     try {
       const isTransaction = await this.prismaService.detail_Pemesanan.findMany({
         where: {
@@ -73,15 +84,16 @@ export class DetailPemesananService {
         },
       });
       if (isTransaction.length < 1) {
-        return res.status(HttpStatus.NOT_FOUND).send(new NotFoundException());
+        return this.helper.conflictWrapper(response, { detailId });
       }
       const detail = await this.prismaService.detail_Pemesanan.delete({
         where: {
           id: Number(detailId),
         },
       });
-      return detail;
+      return this.helper.successWrapper(response, detail);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }

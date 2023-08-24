@@ -20,35 +20,41 @@ export class DetailPemesananController {
   ) {}
 
   @Post()
-  create(@Body() createDetailPemesananDto: CreateDetailPemesananDto) {
-    return this.detailPemesananService.create(createDetailPemesananDto);
+  create(
+    @Body() createDetailPemesananDto: CreateDetailPemesananDto,
+    @Res() response: Response,
+  ) {
+    return this.detailPemesananService.create(
+      createDetailPemesananDto,
+      response,
+    );
   }
 
   @Get()
-  findAll() {
-    return this.detailPemesananService.findAll();
+  findAll(@Res() response: Response) {
+    return this.detailPemesananService.findAll(response);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.detailPemesananService.findOne(id);
+  findOne(@Param('id') id: number, @Res() response: Response) {
+    return this.detailPemesananService.findOne(id, response);
   }
 
   @Patch(':id')
   update(
     @Param('id') id: number,
     @Body() updateDetailPemesananDto: UpdateDetailPemesananDto,
-    @Res() res: Response,
+    @Res() response: Response,
   ) {
     return this.detailPemesananService.update(
       id,
       updateDetailPemesananDto,
-      res,
+      response,
     );
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number, @Res() res: Response) {
-    return this.detailPemesananService.remove(id, res);
+  remove(@Param('id') id: number, @Res() response: Response) {
+    return this.detailPemesananService.remove(id, response);
   }
 }

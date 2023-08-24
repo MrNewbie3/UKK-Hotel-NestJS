@@ -29,6 +29,7 @@ export class UserService {
       const user = await this.prisma.user.findMany();
       return this.helper.successWrapper(response, user);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
@@ -77,6 +78,7 @@ export class UserService {
       delete user.password;
       return this.helper.createdWrapper(response, user);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
@@ -93,6 +95,7 @@ export class UserService {
       delete user.password;
       return this.helper.successWrapper(response, user);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
@@ -138,6 +141,7 @@ export class UserService {
       delete user.password;
       return this.helper.successWrapper(response, user);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
@@ -162,6 +166,7 @@ export class UserService {
       delete user.password;
       return this.helper.successWrapper(response, user);
     } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
       throw new Error(error);
     }
   }
