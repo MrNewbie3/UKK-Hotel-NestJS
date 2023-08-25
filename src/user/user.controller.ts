@@ -9,6 +9,7 @@ import {
   Req,
   Res,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -16,7 +17,16 @@ import { Request, Response } from 'express';
 import { createUserDto } from './dto/create-user.dto';
 import { updateUserDto } from './dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { RolesGuard } from 'src/guards/roles.guard';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { Roles } from 'src/decorator/roles.decorator';
+import { Role } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('USER')
+@UseGuards(RolesGuard)
+@UseGuards(AuthGuard)
+@Roles(Role.ADMIN)
 @Controller('user')
 export class UserController {
   constructor(private readonly appService: UserService) {}

@@ -12,15 +12,17 @@ import {
 import { KamarService } from './kamar.service';
 import { CreateKamarDto } from './dto/create-kamar.dto';
 import { UpdateKamarDto } from './dto/update-kamar.dto';
-import { Response, response } from 'express';
+import { Response } from 'express';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Roles } from 'src/decorator/roles.decorator';
 import { Role } from '@prisma/client';
 import { RolesGuard } from 'src/guards/roles.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('KAMAR')
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard)
-@Roles(Role.RESEPSIONIS, Role.ADMIN)
+@Roles(Role.ADMIN)
 @Controller('kamar')
 export class KamarController {
   constructor(private readonly kamarService: KamarService) {}

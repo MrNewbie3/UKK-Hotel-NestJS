@@ -7,12 +7,22 @@ import {
   Param,
   Delete,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { DetailPemesananService } from './detail_pemesanan.service';
 import { CreateDetailPemesananDto } from './dto/create-detail_pemesanan.dto';
 import { UpdateDetailPemesananDto } from './dto/update-detail_pemesanan.dto';
 import { Response } from 'express';
+import { RolesGuard } from 'src/guards/roles.guard';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { Roles } from 'src/decorator/roles.decorator';
+import { Role } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('DETAIL PEMESANAN')
+@UseGuards(RolesGuard)
+@UseGuards(AuthGuard)
+@Roles(Role.RESEPSIONIS)
 @Controller('detail-pemesanan')
 export class DetailPemesananController {
   constructor(
@@ -31,6 +41,7 @@ export class DetailPemesananController {
   }
 
   @Get()
+  @Roles(Role.USER)
   findAll(@Res() response: Response) {
     return this.detailPemesananService.findAll(response);
   }

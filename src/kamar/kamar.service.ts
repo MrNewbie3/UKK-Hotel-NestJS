@@ -1,9 +1,10 @@
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateKamarDto } from './dto/update-kamar.dto';
 import { HelperService } from 'src/helper/helper.service';
+import { CreateKamarDto } from './dto/create-kamar.dto';
 
 @Injectable()
 export class KamarService {
@@ -11,7 +12,10 @@ export class KamarService {
     private prismaService: PrismaService,
     private readonly helper: HelperService,
   ) {}
-  async create(createKamarDto: any, response: Response): Promise<any> {
+  async create(
+    createKamarDto: CreateKamarDto,
+    response: Response,
+  ): Promise<any> {
     try {
       const room = await this.prismaService.kamar.create({
         data: createKamarDto,

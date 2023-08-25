@@ -11,11 +11,12 @@ import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { Response, Request } from 'express';
 import { AuthGuard } from '../guards/auth.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('AUTH')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
   @Get()
   @UseGuards(AuthGuard)
   getUserAuth(

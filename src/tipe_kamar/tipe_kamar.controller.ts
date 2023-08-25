@@ -8,12 +8,22 @@ import {
   Delete,
   Res,
   UploadedFile,
+  UseGuards,
 } from '@nestjs/common';
 import { TipeKamarService } from './tipe_kamar.service';
 import { CreateTipeKamarDto } from './dto/create-tipe_kamar.dto';
 import { UpdateTipeKamarDto } from './dto/update-tipe_kamar.dto';
 import { Response } from 'express';
+import { RolesGuard } from 'src/guards/roles.guard';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { Roles } from 'src/decorator/roles.decorator';
+import { Role } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('TIPE KAMAR')
+@UseGuards(RolesGuard)
+@UseGuards(AuthGuard)
+@Roles(Role.ADMIN)
 @Controller('types')
 export class TipeKamarController {
   constructor(private readonly tipeKamarService: TipeKamarService) {}
@@ -28,6 +38,7 @@ export class TipeKamarController {
   }
 
   @Get()
+  @Roles(Role.USER)
   findAll(@Res() response: Response) {
     return this.tipeKamarService.findAll(response);
   }

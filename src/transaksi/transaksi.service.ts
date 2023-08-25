@@ -3,6 +3,7 @@ import { UpdateTransaksiDto } from './dto/update-transaksi.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Response } from 'express';
 import { HelperService } from 'src/helper/helper.service';
+import { CreateTransaksiDto } from './dto/create-transaksi.dto';
 
 @Injectable()
 export class TransaksiService {
@@ -20,7 +21,7 @@ export class TransaksiService {
     }
   }
   async createTransaction(
-    createTransaksiDto: any,
+    createTransaksiDto: CreateTransaksiDto,
     response: Response,
   ): Promise<any> {
     try {

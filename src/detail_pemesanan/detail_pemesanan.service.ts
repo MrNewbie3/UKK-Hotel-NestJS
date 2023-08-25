@@ -1,8 +1,9 @@
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UpdateDetailPemesananDto } from './dto/update-detail_pemesanan.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Response } from 'express';
 import { HelperService } from 'src/helper/helper.service';
+import { CreateDetailPemesananDto } from './dto/create-detail_pemesanan.dto';
 
 @Injectable()
 export class DetailPemesananService {
@@ -11,7 +12,7 @@ export class DetailPemesananService {
     private readonly helper: HelperService,
   ) {}
   async create(
-    createDetailPemesananDto: any,
+    createDetailPemesananDto: CreateDetailPemesananDto,
     response: Response,
   ): Promise<Response<any>> {
     try {
