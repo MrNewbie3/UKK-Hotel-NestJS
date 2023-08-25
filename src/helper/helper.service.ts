@@ -1,4 +1,5 @@
 import { HttpCode, HttpStatus, Injectable } from '@nestjs/common';
+import { ApiResponse } from '@nestjs/swagger';
 import { Response } from 'express';
 
 @Injectable()

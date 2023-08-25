@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Response } from 'express';
 import { HelperService } from 'src/helper/helper.service';
 import { CreateTransaksiDto } from './dto/create-transaksi.dto';
+import { QueryDTO } from './dto/query.dto';
 
 @Injectable()
 export class TransaksiService {
@@ -103,4 +104,21 @@ export class TransaksiService {
       throw new Error(error);
     }
   }
+
+  async filterTransaction(params: QueryDTO, response: Response) {
+    try {
+      const findByParams = await this.prismaService.pemesanan.findMany({
+        where: params,
+      });
+      if (findByParams.length < 1) {
+        return this.helper.notFoundWrapper(response, params);
+      }
+      return this.helper.successWrapper(response, findByParams);
+    } catch (error) {
+      this.helper.internalServerErrorWrapper(response, error);
+      throw new Error(error);
+    }
+  }
 }
+
+// : Promise<Response<any>>

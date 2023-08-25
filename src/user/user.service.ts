@@ -1,19 +1,15 @@
 import {
   Body,
-  ConflictException,
-  HttpStatus,
   Injectable,
-  InternalServerErrorException,
-  NotFoundException,
   Param,
   Req,
   Res,
   UploadedFile,
 } from '@nestjs/common';
-import { Request, Response, response } from 'express';
+import { Request, Response } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { createUserDto } from './dto/create-user.dto';
-import { updateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import * as argon2 from 'argon2';
 import { ImageKitService } from 'src/service/imagekit_service';
 import { HelperService } from 'src/helper/helper.service';
@@ -37,7 +33,7 @@ export class UserService {
   async postUser(
     @Req() req: Request,
     @Res() response: Response,
-    @Body() payload: createUserDto,
+    @Body() payload: CreateUserDto,
     @UploadedFile() foto: Buffer,
   ): Promise<any> {
     try {
@@ -102,7 +98,7 @@ export class UserService {
   async updateUser(
     @Param() userId: any,
     @Res() response: Response,
-    @Body() payload: updateUserDto,
+    @Body() payload: UpdateUserDto,
     @UploadedFile() foto: Buffer,
   ): Promise<Response<any>> {
     let data = payload;

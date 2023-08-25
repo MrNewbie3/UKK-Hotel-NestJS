@@ -8,6 +8,7 @@ import {
   Delete,
   Res,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { TransaksiService } from './transaksi.service';
 import { CreateTransaksiDto } from './dto/create-transaksi.dto';
@@ -18,6 +19,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { Roles } from 'src/decorator/roles.decorator';
 import { Role } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
+import { QueryDTO } from './dto/query.dto';
 
 @ApiTags('TRANSAKSI')
 @UseGuards(RolesGuard)
@@ -44,6 +46,10 @@ export class TransaksiController {
     return this.transaksiService.findAllTransaction(response);
   }
 
+  @Get('find')
+  GetByQuery(@Query() query: QueryDTO, @Res() response: Response) {
+    return this.transaksiService.filterTransaction(query, response);
+  }
   @Get(':id')
   @Roles(Role.USER)
   findOne(

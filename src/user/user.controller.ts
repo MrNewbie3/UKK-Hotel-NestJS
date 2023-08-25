@@ -14,8 +14,8 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Request, Response } from 'express';
-import { createUserDto } from './dto/create-user.dto';
-import { updateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -48,7 +48,7 @@ export class UserController {
   createData(
     @Req() request: Request,
     @Res() response: Response,
-    @Body() body: createUserDto,
+    @Body() body: CreateUserDto,
     @UploadedFile() foto: Buffer,
   ): Promise<Response<any>> {
     return this.appService.postUser(request, response, body, foto);
@@ -57,7 +57,7 @@ export class UserController {
   @Put(':id')
   @UseInterceptors(FileInterceptor('foto'))
   updateData(
-    @Body() body: updateUserDto,
+    @Body() body: UpdateUserDto,
     @Res() res: Response,
     @Param('id') id: number,
     @UploadedFile() foto: Buffer,
