@@ -9,6 +9,7 @@ import { TipeKamarModule } from './tipe_kamar/tipe_kamar.module';
 import { ServiceModule } from './service/service.module';
 import { AuthModule } from './auth/auth.module';
 import { HelperModule } from './helper/helper.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { HelperModule } from './helper/helper.module';
     ServiceModule,
     AuthModule,
     HelperModule,
+    MailModule,
   ],
 })
 export class AppModule {}

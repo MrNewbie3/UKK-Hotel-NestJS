@@ -27,7 +27,11 @@ export class TipeKamarService {
       if (!uploadImage) {
         return this.helper.internalServerErrorWrapper(response, uploadImage);
       }
-      payload = { ...createTipeKamarDto, foto: uploadImage };
+      payload = {
+        ...createTipeKamarDto,
+        foto: uploadImage,
+        harga: Number(createTipeKamarDto.harga),
+      };
     }
     try {
       const roomTypes = await this.prismaService.tipe_Kamar.create({
@@ -72,11 +76,12 @@ export class TipeKamarService {
   ): Promise<any> {
     let payload = updateTipeKamarDto;
     try {
-      const isRoomExist = await this.prismaService.kamar.findMany({
+      const isRoomExist = await this.prismaService.tipe_Kamar.findMany({
         where: {
           id: Number(id),
         },
       });
+
       if (isRoomExist.length < 1) {
         return this.helper.notFoundWrapper(response, { id });
       }
@@ -88,7 +93,11 @@ export class TipeKamarService {
         if (!updateImage) {
           return this.helper.internalServerErrorWrapper(response, updateImage);
         }
-        payload = { ...updateTipeKamarDto, foto: updateImage };
+        payload = {
+          ...updateTipeKamarDto,
+          foto: updateImage,
+          harga: Number(updateTipeKamarDto.harga),
+        };
       }
       const roomTypes = await this.prismaService.tipe_Kamar.update({
         where: {

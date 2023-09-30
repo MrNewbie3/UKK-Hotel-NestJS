@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,6 +12,7 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+  app.use(cookieParser());
   app.enableCors();
 
   const config = new DocumentBuilder()
@@ -24,6 +26,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(process.env.PORT);
+  await app.listen(process.env.PORT, () => {
+    console.log('Listening on port ' + process.env.PORT);
+  });
 }
 bootstrap();

@@ -27,7 +27,11 @@ export class AuthController {
   }
 
   @Post()
-  create(@Res() response: Response, @Body() createAuthDto: CreateAuthDto) {
-    return this.authService.signIn(createAuthDto, response);
+  create(
+    @Body() createAuthDto: CreateAuthDto,
+    @Req() request: Request,
+    @Res() response: Response,
+  ) {
+    return this.authService.signIn(createAuthDto, request, response);
   }
 }

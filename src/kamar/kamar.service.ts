@@ -5,18 +5,31 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateKamarDto } from './dto/update-kamar.dto';
 import { HelperService } from 'src/helper/helper.service';
 import { CreateKamarDto } from './dto/create-kamar.dto';
+import { ImageKitService } from 'src/service/imagekit_service';
 
 @Injectable()
 export class KamarService {
   constructor(
     private prismaService: PrismaService,
     private readonly helper: HelperService,
+    private readonly imagekitService: ImageKitService,
   ) {}
   async create(
     createKamarDto: CreateKamarDto,
     response: Response,
   ): Promise<any> {
     try {
+      const isTypeExist = await this.prismaService.tipe_Kamar.findFirst({
+        where: {
+          id: createKamarDto.id_tipe_kamar,
+        },
+      });
+      if (!isTypeExist) {
+        return this.helper.internalServerErrorWrapper(
+          response,
+          "Room ID doesn't exist",
+        );
+      }
       const room = await this.prismaService.kamar.create({
         data: createKamarDto,
       });

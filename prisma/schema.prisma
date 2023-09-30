@@ -25,11 +25,13 @@ enum Status {
 model User {
   id        Int         @id @default(autoincrement())
   nama      String      @unique
+  email     String      @unique
   foto      String?
-  email     String
   password  String?
   role      Role
   pemesanan Pemesanan[]
+  is_active Boolean     @default(false)
+  auth_code String      @unique
 }
 
 model Pemesanan {
@@ -48,6 +50,8 @@ model Pemesanan {
   user_id          Int
   tipe_kamar       Tipe_Kamar         @relation(fields: [id_tipe_kamar], references: [id])
   detail_pemesanan Detail_Pemesanan[]
+  Kamar            Kamar?             @relation(fields: [id_kamar], references: [id])
+  id_kamar         Int?
 }
 
 model Detail_Pemesanan {
@@ -64,6 +68,7 @@ model Kamar {
   id               Int                @id @default(autoincrement())
   nomor            Int                @unique
   id_tipe_kamar    Int
+  pemesanan        Pemesanan[]
   detail_pemesanan Detail_Pemesanan[]
   tipe_kamar       Tipe_Kamar         @relation(fields: [id_tipe_kamar], references: [id])
 }

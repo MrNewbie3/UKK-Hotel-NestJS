@@ -39,13 +39,21 @@ export class AuthGuard implements CanActivate {
     request: Request,
     response: Response,
   ): string | undefined | any {
-    if (!request.headers.authorization) {
-      const unauthhorized = new UnauthorizedException();
-      return response
-        .status(HttpStatus.UNAUTHORIZED)
-        .send({ ...unauthhorized, message: 'You need to login' });
+    if (request['cookies']) {
+      const { token } = request['cookies'];
+      return token;
     }
+    if (!request.headers.authorization && !request['cookies']) {
+      return response.send({
+        success: false,
+        msg: 'Internal Server Error',
+        error: new UnauthorizedException(),
+        code: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+
     const [type, token] = request.headers.authorization.split(' ') ?? [];
+
     return type === 'Bearer' ? token : undefined;
   }
 }

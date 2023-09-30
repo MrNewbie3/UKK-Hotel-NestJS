@@ -9,6 +9,7 @@ import {
   Res,
   UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { TipeKamarService } from './tipe_kamar.service';
 import { CreateTipeKamarDto } from './dto/create-tipe_kamar.dto';
@@ -19,6 +20,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { Roles } from 'src/decorator/roles.decorator';
 import { Role } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('TIPE KAMAR')
 @UseGuards(RolesGuard)
@@ -29,6 +31,7 @@ export class TipeKamarController {
   constructor(private readonly tipeKamarService: TipeKamarService) {}
 
   @Post()
+  @UseInterceptors(FileInterceptor('foto'))
   create(
     @Body() createTipeKamarDto: CreateTipeKamarDto,
     @UploadedFile() foto: Buffer,
@@ -38,7 +41,7 @@ export class TipeKamarController {
   }
 
   @Get()
-  @Roles(Role.USER)
+  @Roles(Role.USER, Role.ADMIN)
   findAll(@Res() response: Response) {
     return this.tipeKamarService.findAll(response);
   }
@@ -49,6 +52,7 @@ export class TipeKamarController {
   }
 
   @Patch(':id')
+  @UseInterceptors(FileInterceptor('foto'))
   update(
     @Body() updateTipeKamarDto: UpdateTipeKamarDto,
     @Param('id') id: number,

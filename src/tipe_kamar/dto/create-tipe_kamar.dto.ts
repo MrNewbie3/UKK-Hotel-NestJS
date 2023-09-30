@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateTipeKamarDto {
   @IsString()
@@ -7,7 +7,6 @@ export class CreateTipeKamarDto {
   @ApiProperty()
   nama: string;
 
-  @IsNumber()
   @IsNotEmpty()
   @ApiProperty()
   harga: number;
@@ -21,5 +20,6 @@ export class CreateTipeKamarDto {
   @ApiProperty({
     required: false,
   })
+  @IsOptional()
   foto: string;
 }

@@ -1,5 +1,4 @@
 import { HttpCode, HttpStatus, Injectable } from '@nestjs/common';
-import { ApiResponse } from '@nestjs/swagger';
 import { Response } from 'express';
 
 @Injectable()
@@ -24,7 +23,7 @@ export class HelperService {
     data?: any,
     message?: string,
   ): Response<any> {
-    return response.send({
+    return response.status(HttpStatus.CREATED).send({
       success: true,
       msg: message || 'data created successfully',
       data: data || [],
@@ -34,7 +33,7 @@ export class HelperService {
 
   @HttpCode(HttpStatus.NOT_FOUND)
   notFoundWrapper(response: Response, data: any): Response<any> {
-    return response.send({
+    return response.status(HttpStatus.NOT_FOUND).send({
       success: false,
       msg: 'Data request was not found',
       data: data,
@@ -59,6 +58,15 @@ export class HelperService {
       msg: 'Internal Server Error',
       error,
       code: HttpStatus.INTERNAL_SERVER_ERROR,
+    });
+  }
+  @HttpCode(HttpStatus.BAD_REQUEST)
+  badRequestHelper(response: Response, error: any): Response<any> {
+    return response.send({
+      success: false,
+      msg: 'Bad Request',
+      error,
+      code: HttpStatus.BAD_REQUEST,
     });
   }
 }

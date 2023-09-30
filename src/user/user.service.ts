@@ -68,9 +68,11 @@ export class UserService {
           email,
           role,
           password,
+          auth_code: '',
           foto: uploadedImage,
         },
       });
+
       delete user.password;
       return this.helper.createdWrapper(response, user);
     } catch (error) {
