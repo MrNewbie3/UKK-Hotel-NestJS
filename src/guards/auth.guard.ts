@@ -6,13 +6,15 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { log } from 'console';
 import { Request, Response } from 'express';
 import * as fs from 'fs';
 import { dirname } from 'path';
+import { HelperService } from 'src/helper/helper.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(private jwtService: JwtService, private helper: HelperService) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
@@ -21,7 +23,6 @@ export class AuthGuard implements CanActivate {
       dirname(require.main.path) + '/private.pem',
       'utf8',
     );
-
     if (!token) {
       throw new UnauthorizedException();
     }
@@ -39,17 +40,13 @@ export class AuthGuard implements CanActivate {
     request: Request,
     response: Response,
   ): string | undefined | any {
-    if (request['cookies']) {
+    if (request['cookies'].token) {
       const { token } = request['cookies'];
       return token;
     }
-    if (!request.headers.authorization && !request['cookies']) {
-      return response.send({
-        success: false,
-        msg: 'Internal Server Error',
-        error: new UnauthorizedException(),
-        code: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
+
+    if (!request.headers.authorization || !request['cookies']) {
+      return this.helper.unauthorizedHelper(response);
     }
 
     const [type, token] = request.headers.authorization.split(' ') ?? [];

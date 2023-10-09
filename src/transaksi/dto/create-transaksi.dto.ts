@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Status } from '@prisma/client';
 import {
   IsDate,
+  IsDateString,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -29,17 +30,17 @@ export class CreateTransaksiDto {
   email_pemesan: string;
 
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   @ApiProperty()
   tgl_pemesanan: string;
 
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   @ApiProperty()
   tgl_check_in: string;
 
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   @ApiProperty()
   tgl_check_out: string;
 
@@ -59,6 +60,12 @@ export class CreateTransaksiDto {
   @IsPositive()
   @ApiProperty()
   id_tipe_kamar: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @IsPositive()
+  @ApiProperty()
+  id_kamar: number;
 
   @IsEnum(Status)
   @IsNotEmpty()

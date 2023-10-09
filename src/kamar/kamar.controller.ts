@@ -22,7 +22,7 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('KAMAR')
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard)
-@Roles(Role.ADMIN)
+@Roles(Role.ADMIN, Role.USER)
 @Controller('kamar')
 export class KamarController {
   constructor(private readonly kamarService: KamarService) {}

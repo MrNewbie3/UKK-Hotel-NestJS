@@ -42,16 +42,20 @@ export class TransaksiController {
   }
 
   @Get()
+  @Roles(Role.USER)
   findAll(@Res() response: Response): Promise<Response<any>> {
     return this.transaksiService.findAllTransaction(response);
   }
 
   @Get('find')
+  @Roles(Role.USER, Role.ADMIN)
   GetByQuery(@Query() query: QueryDTO, @Res() response: Response) {
+    console.log(query);
+
     return this.transaksiService.filterTransaction(query, response);
   }
   @Get(':id')
-  @Roles(Role.USER)
+  @Roles(Role.USER, Role.RESEPSIONIS)
   findOne(
     @Param('id') id: number,
     @Res() response: Response,

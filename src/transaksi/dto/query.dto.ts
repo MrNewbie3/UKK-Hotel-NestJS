@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class QueryDTO {
   @IsString()
@@ -7,4 +7,10 @@ export class QueryDTO {
   @IsString()
   @IsOptional()
   tgl_check_in: string;
+  @IsNumber()
+  @IsOptional()
+  id_tipe_kamar: number;
+  @IsString()
+  @IsOptional()
+  user_id: number;
 }

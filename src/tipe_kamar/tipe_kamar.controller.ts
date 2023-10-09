@@ -25,7 +25,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 @ApiTags('TIPE KAMAR')
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard)
-@Roles(Role.ADMIN)
+@Roles(Role.ADMIN, Role.USER)
 @Controller('types')
 export class TipeKamarController {
   constructor(private readonly tipeKamarService: TipeKamarService) {}

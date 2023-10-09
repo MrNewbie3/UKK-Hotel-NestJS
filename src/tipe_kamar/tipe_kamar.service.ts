@@ -74,7 +74,10 @@ export class TipeKamarService {
     response: Response,
     foto: Buffer,
   ): Promise<any> {
-    let payload = updateTipeKamarDto;
+    let payload = {
+      ...updateTipeKamarDto,
+      harga: Number(updateTipeKamarDto.harga),
+    };
     try {
       const isRoomExist = await this.prismaService.tipe_Kamar.findMany({
         where: {
@@ -114,12 +117,12 @@ export class TipeKamarService {
 
   async remove(id: number, response: Response): Promise<any> {
     try {
-      const isRoomExist = await this.prismaService.kamar.findMany({
+      const isRoomExist = await this.prismaService.tipe_Kamar.findUnique({
         where: {
           id: Number(id),
         },
       });
-      if (isRoomExist.length < 1) {
+      if (!isRoomExist) {
         return this.helper.notFoundWrapper(response, { id });
       }
       const roomTypes = await this.prismaService.tipe_Kamar.delete({

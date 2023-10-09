@@ -24,6 +24,14 @@ export class KamarService {
           id: createKamarDto.id_tipe_kamar,
         },
       });
+      const isRoomExist = await this.prismaService.kamar.findFirst({
+        where: {
+          nomor: createKamarDto.nomor,
+        },
+      });
+      if (isRoomExist) {
+        return this.helper.conflictWrapper(response, isRoomExist.nomor);
+      }
       if (!isTypeExist) {
         return this.helper.internalServerErrorWrapper(
           response,

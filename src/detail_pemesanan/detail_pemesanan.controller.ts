@@ -22,7 +22,7 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('DETAIL PEMESANAN')
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard)
-@Roles(Role.RESEPSIONIS)
+@Roles(Role.RESEPSIONIS, Role.USER)
 @Controller('detail-pemesanan')
 export class DetailPemesananController {
   constructor(

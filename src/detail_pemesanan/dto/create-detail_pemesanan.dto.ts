@@ -1,13 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Status } from '@prisma/client';
 import {
-  IsDate,
-  IsEmail,
-  IsEnum,
+  IsDateString,
   IsNotEmpty,
   IsNumber,
   IsPositive,
-  IsString,
 } from 'class-validator';
 
 export class CreateDetailPemesananDto {
@@ -23,7 +19,7 @@ export class CreateDetailPemesananDto {
   @ApiProperty()
   id_kamar: number;
 
-  @IsDate()
+  @IsDateString()
   @IsNotEmpty()
   @ApiProperty()
   tgl_akses: string;

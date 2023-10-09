@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res } from '@nestjs/common';
+import { Controller, Post, Body, Res, Get, Param } from '@nestjs/common';
 import { MailService } from './mail.service';
 import { CreateMailDto } from './dto/create-mail.dto';
 import { Response } from 'express';
@@ -10,5 +10,13 @@ export class MailController {
   @Post()
   create(@Body() createMailDto: CreateMailDto, @Res() response: Response) {
     return this.mailService.create(createMailDto, response);
+  }
+  @Post(':id')
+  validate(
+    @Body() email: CreateMailDto,
+    @Param('id') params: string,
+    @Res() response: Response,
+  ) {
+    return this.mailService.validate(response, params, email);
   }
 }

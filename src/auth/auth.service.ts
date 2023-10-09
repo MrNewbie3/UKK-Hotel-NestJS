@@ -58,13 +58,12 @@ export class AuthService {
 
     const user = await this.prismaService.user.findUnique({
       where: {
-        email: username,
+        nama: username,
       },
     });
+
     if (!user) {
-      return response
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .send(new InternalServerErrorException());
+      return this.helper.internalServerErrorWrapper(response, user);
     }
     delete user.password;
     return response.status(HttpStatus.OK).send(user);

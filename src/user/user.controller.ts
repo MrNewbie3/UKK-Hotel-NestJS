@@ -24,18 +24,22 @@ import { Role } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('USER')
-@UseGuards(RolesGuard)
-@UseGuards(AuthGuard)
-@Roles(Role.ADMIN)
 @Controller('user')
 export class UserController {
   constructor(private readonly appService: UserService) {}
+
   @Get()
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard)
+  @Roles(Role.ADMIN)
   getUsers(@Res() response: Response): Promise<Response<any[]>> {
     return this.appService.getUser(response);
   }
 
   @Get(':id')
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard)
+  @Roles(Role.ADMIN)
   getSingle(
     @Param('id') id: number,
     @Res() response: Response,
@@ -55,6 +59,9 @@ export class UserController {
   }
 
   @Put(':id')
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard)
+  @Roles(Role.ADMIN)
   @UseInterceptors(FileInterceptor('foto'))
   updateData(
     @Body() body: UpdateUserDto,
@@ -65,6 +72,9 @@ export class UserController {
     return this.appService.updateUser(id, res, body, foto);
   }
   @Delete(':id')
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard)
+  @Roles(Role.ADMIN)
   deleteData(
     @Param('id') id: number,
     @Res() response: Response,

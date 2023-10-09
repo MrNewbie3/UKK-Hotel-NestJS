@@ -107,11 +107,18 @@ export class TransaksiService {
 
   async filterTransaction(params: QueryDTO, response: Response) {
     try {
+      let query: QueryDTO;
+      if (params.user_id) {
+        query = { ...params, user_id: Number(params.user_id) };
+      }
+      if (params.id_tipe_kamar) {
+        query = { ...params, user_id: Number(params.id_tipe_kamar) };
+      }
       const findByParams = await this.prismaService.pemesanan.findMany({
-        where: params,
+        where: query,
       });
       if (findByParams.length < 1) {
-        return this.helper.notFoundWrapper(response, params);
+        return this.helper.notFoundWrapper(response);
       }
       return this.helper.successWrapper(response, findByParams);
     } catch (error) {
