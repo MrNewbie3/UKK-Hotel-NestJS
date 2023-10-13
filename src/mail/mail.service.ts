@@ -6,7 +6,7 @@ import { Response } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import base64url from 'base64url';
-import { layout } from './layout/mail.layout';.
+import { layout } from './layout/mail.layout';
 import { envi } from 'src/config/envi';
 @Injectable()
 export class MailService {
@@ -47,7 +47,7 @@ export class MailService {
         },
       });
       const sendMail = await this.transporter.sendMail({
-        from: 'atharafiaffandy@gmail.com',
+        from: envi.EMAIL,
         to: sendEmailDto.to,
         subject: 'Email Verification',
         html: layout(saveUrl),
@@ -77,9 +77,6 @@ export class MailService {
       }
       const decodePath = base64url.fromBase64(params);
       const isValid = decodePath === data.auth_code;
-      console.log(decodePath);
-      console.log(data.auth_code);
-      console.log(isValid);
 
       if (!isValid) {
         return this.create(
