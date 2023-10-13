@@ -1,12 +1,10 @@
 import {
   CanActivate,
   ExecutionContext,
-  HttpStatus,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { log } from 'console';
 import { Request, Response } from 'express';
 import * as fs from 'fs';
 import { dirname } from 'path';
