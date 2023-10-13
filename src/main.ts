@@ -6,7 +6,9 @@ import * as cookieParser from 'cookie-parser';
 import { envi } from './config/envi';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['debug', 'verbose', 'error', 'log'],
+  });
   app.setGlobalPrefix('/api/v1');
   app.useGlobalPipes(
     new ValidationPipe({

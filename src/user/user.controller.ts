@@ -31,7 +31,7 @@ export class UserController {
   @Get()
   @UseGuards(RolesGuard)
   @UseGuards(AuthGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.SUPERADMIN)
   getUsers(@Res() response: Response): Promise<Response<any[]>> {
     return this.appService.getUser(response);
   }
@@ -39,7 +39,7 @@ export class UserController {
   @Get(':id')
   @UseGuards(RolesGuard)
   @UseGuards(AuthGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.SUPERADMIN)
   getSingle(
     @Param('id') id: number,
     @Res() response: Response,
@@ -48,20 +48,18 @@ export class UserController {
   }
 
   @Post()
-  @UseInterceptors(FileInterceptor('foto'))
   createData(
     @Req() request: Request,
     @Res() response: Response,
     @Body() body: CreateUserDto,
-    @UploadedFile() foto: Buffer,
   ): Promise<Response<any>> {
-    return this.appService.postUser(request, response, body, foto);
+    return this.appService.postUser(request, response, body);
   }
 
   @Put(':id')
   @UseGuards(RolesGuard)
   @UseGuards(AuthGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.SUPERADMIN)
   @UseInterceptors(FileInterceptor('foto'))
   updateData(
     @Body() body: UpdateUserDto,
@@ -74,7 +72,7 @@ export class UserController {
   @Delete(':id')
   @UseGuards(RolesGuard)
   @UseGuards(AuthGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.SUPERADMIN)
   deleteData(
     @Param('id') id: number,
     @Res() response: Response,

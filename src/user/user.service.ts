@@ -34,12 +34,11 @@ export class UserService {
     @Req() req: Request,
     @Res() response: Response,
     @Body() payload: CreateUserDto,
-    @UploadedFile() foto: Buffer,
   ): Promise<any> {
     try {
-      const isUserExist = await this.prisma.user.findUnique({
+      const isUserExist = await this.prisma.user.findFirst({
         where: {
-          nama: payload.nama,
+          name: payload.name,
         },
       });
 
@@ -47,29 +46,13 @@ export class UserService {
         delete isUserExist.password;
         return this.helper.conflictWrapper(response, isUserExist);
       }
-      let uploadedImage = 'undefined';
-      if (foto && !isUserExist) {
-        const upload = await this.imageUpload.uploadFiles(
-          foto,
-          new Date() + '_' + payload.nama + '_photo.jpg',
-        );
-        if (!upload) {
-          return this.helper.internalServerErrorWrapper(response, upload);
-        }
-        uploadedImage = upload;
-      }
-      const { email, nama, role } = payload;
 
       const password = await argon2.hash(payload.password);
 
       const user = await this.prisma.user.create({
         data: {
-          nama,
-          email,
-          role,
+          ...payload,
           password,
-          auth_code: '',
-          foto: uploadedImage,
         },
       });
 
@@ -103,7 +86,7 @@ export class UserService {
     @Body() payload: UpdateUserDto,
     @UploadedFile() foto: Buffer,
   ): Promise<Response<any>> {
-    let data = payload;
+    const data = payload;
 
     try {
       const findUser = await this.prisma.user.findMany({
@@ -115,20 +98,10 @@ export class UserService {
         return this.helper.notFoundWrapper(response, data);
       }
       const validation = await this.prisma.user.findUnique({
-        where: { nama: payload.nama },
+        where: { email: payload.email },
       });
       if (validation && findUser[0].id != userId) {
-        return this.helper.conflictWrapper(response, data.nama);
-      }
-      if (foto) {
-        const upload = await this.imageUpload.uploadFiles(
-          foto,
-          new Date() + '_' + payload.nama + '_photo.jpg',
-        );
-        if (!upload) {
-          return this.helper.internalServerErrorWrapper(response, upload);
-        }
-        data = { ...payload, foto: upload };
+        return this.helper.conflictWrapper(response, data.email);
       }
       const user = await this.prisma.user.update({
         where: {

@@ -103,7 +103,7 @@ model Casual {
   waktuPelaksanaan DateTime
   statusCasual     String
 
-  users   User[]   @relation(references: [id])
+  users   User[]
   ratings Rating[]
   Dudi    Dudi?    @relation(fields: [dudiId], references: [id])
   dudiId  Int?

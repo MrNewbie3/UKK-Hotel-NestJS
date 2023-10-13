@@ -1,8 +1,4 @@
-import {
-  HttpStatus,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon2 from 'argon2';
@@ -41,24 +37,29 @@ export class AuthService {
       'utf-8',
     );
 
-    const payload = { sub: user.id, username: user.nama, role: user.role };
-    const access_token = await this.jwtService.signAsync(payload, {
+    const payload = {
+      sub: user.id,
+      username: user.name,
+      role: user.role,
+      email: user.email,
+    };
+    const accessToken = await this.jwtService.signAsync(payload, {
       algorithm: 'RS512',
       secret: privateKey,
     });
-    response.cookie('token', access_token);
+    response.cookie('token', accessToken);
     return this.helper.successWrapper(response, {
       ...payload,
-      access_token,
+      accessToken,
     });
   }
 
   async getUserAuth(request: Request, response: Response) {
-    const { username } = request['user'];
+    const { email } = request['user'];
 
     const user = await this.prismaService.user.findUnique({
       where: {
-        nama: username,
+        email,
       },
     });
 

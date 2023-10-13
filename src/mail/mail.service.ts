@@ -38,14 +38,7 @@ export class MailService {
       if (!isDataExist) {
         return this.helper.notFoundWrapper(response, [sendEmailDto]);
       }
-      await this.prisma.user.update({
-        where: {
-          email: sendEmailDto.to,
-        },
-        data: {
-          auth_code: saveUrl,
-        },
-      });
+
       const sendMail = await this.transporter.sendMail({
         from: envi.EMAIL,
         to: sendEmailDto.to,
@@ -76,26 +69,10 @@ export class MailService {
         return this.helper.notFoundWrapper(response, [email]);
       }
       const decodePath = base64url.fromBase64(params);
-      const isValid = decodePath === data.auth_code;
 
-      if (!isValid) {
-        return this.create(
-          email,
-          response,
-          "Invalid auth code, we've send new email to you ",
-        );
-      }
-      const updatedData = await this.prisma.user.update({
-        where: {
-          email: data.email,
-        },
-        data: {
-          is_active: true,
-        },
-      });
       return this.helper.successWrapper(
         response,
-        updatedData,
+        'updatedData',
         'success validate user',
       );
     } catch (error) {
