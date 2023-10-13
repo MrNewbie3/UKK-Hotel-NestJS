@@ -20,21 +20,19 @@ model User {
   jenisKelamin String
   alamat       String
 
-  dudi   Dudi? @relation(fields: [dudiId], references: [id])
-  dudiId Int?
-
-  siswa   Siswa? 
-
-  Casual   Casual? @relation(fields: [casualId], references: [id])
-  casualId Int?
+  dudi    Dudi?
+  siswa   Siswa?
+  casuals Casual[]
 
   ratings       Rating[]
   notifications Notification[]
+  UserCasual    UserCasual[]
 }
 
 enum UserRole {
   ADMIN_DUDI
   SISWA
+  GURU
   SUPERADMIN
 }
 
@@ -50,11 +48,12 @@ model Dudi {
   namaPenanggungJawab String
   bidang              String
 
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
+
   casuals Casual[]
-  User    User[]
 }
 
-// Define the Siswa model
 model Siswa {
   id                 Int    @id @default(autoincrement())
   kelas              String
@@ -63,8 +62,8 @@ model Siswa {
   nisn               String
   status             String
 
-  user        User              @relation(fields: [userId], references: [id])
-  userId      Int @unique
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
 
   competences SiswaCompetence[]
   portfolios  PortfolioSiswa[]
@@ -88,7 +87,6 @@ model PortfolioSiswa {
   deskripsi     String
   linkPortfolio String
 
-  // Define a relation to the Siswa model
   siswa   Siswa @relation(fields: [siswaId], references: [id])
   siswaId Int
 }
@@ -103,10 +101,21 @@ model Casual {
   waktuPelaksanaan DateTime
   statusCasual     String
 
-  users   User[]   @relation(references: [id])
-  ratings Rating[]
-  Dudi    Dudi?    @relation(fields: [dudiId], references: [id])
-  dudiId  Int?
+  Dudi       Dudi?        @relation(fields: [dudiId], references: [id])
+  dudiId     Int?
+
+  UserCasual UserCasual[]
+  users      User[]
+  ratings    Rating[]
+}
+
+model UserCasual {
+  id       Int    @id @default(autoincrement())
+  userId   Int
+  casualId Int
+
+  user     User   @relation(fields: [userId], references: [id])
+  casual   Casual @relation(fields: [casualId], references: [id])
 }
 
 model Rating {
