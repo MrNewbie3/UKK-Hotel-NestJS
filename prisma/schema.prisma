@@ -15,7 +15,7 @@ model User {
   name         String
   email        String   @unique
   password     String
-  role         UserRole
+  role         Role
   nomerHp      String
   jenisKelamin String
   alamat       String
@@ -29,10 +29,12 @@ model User {
   UserCasual    UserCasual[]
 }
 
-enum UserRole {
+enum Role {
   ADMIN_DUDI
   SISWA
   GURU
+  ORANG_TUA
+  ADMIN_SEKOLAH
   SUPERADMIN
 }
 
