@@ -3,17 +3,40 @@ import { Response } from 'express';
 
 @Injectable()
 export class HelperService {
+  private generateResponse(
+    code: number,
+    message: string,
+    data: any,
+    success?: boolean,
+    pagination?: any,
+  ): any {
+    return {
+      meta: {
+        code,
+        message,
+        success: success ? true : false,
+      },
+      data,
+      pagination,
+    };
+  }
   successWrapper(
     response?: Response,
     data?: any,
     message?: string,
+    pagination?: any,
   ): Response<any> {
-    return response.status(HttpStatus.OK).send({
-      success: true,
-      msg: message || 'success providing services',
-      data: data || [],
-      code: HttpStatus.OK,
-    });
+    return response
+      .status(HttpStatus.OK)
+      .send(
+        this.generateResponse(
+          HttpStatus.OK,
+          message || 'success providing services',
+          data || [],
+          true,
+          pagination,
+        ),
+      );
   }
 
   createdWrapper(
@@ -21,58 +44,63 @@ export class HelperService {
     data?: any,
     message?: string,
   ): Response<any> {
-    return response.status(HttpStatus.CREATED).send({
-      success: true,
-      msg: message || 'data created successfully',
-      data: data || [],
-      code: HttpStatus.CREATED,
-    });
+    return response
+      .status(HttpStatus.CREATED)
+      .send(
+        this.generateResponse(
+          HttpStatus.CREATED,
+          message || 'data created successfully',
+          data || [],
+          true,
+        ),
+      );
   }
 
   notFoundWrapper(response: Response, data?: any): Response<any> {
-    return response.status(HttpStatus.NOT_FOUND).send({
-      success: false,
-      msg: 'Data request was not found',
-      data: data || [],
-      code: HttpStatus.NOT_FOUND,
-    });
+    return response
+      .status(HttpStatus.NOT_FOUND)
+      .send(
+        this.generateResponse(
+          HttpStatus.NOT_FOUND,
+          'Data request was not found',
+          data,
+        ),
+      );
   }
 
   conflictWrapper(response: Response, data: any): Response<any> {
-    return response.status(HttpStatus.CONFLICT).send({
-      success: false,
-      msg: 'Data already exists',
-      data,
-      code: HttpStatus.CONFLICT,
-    });
+    return response
+      .status(HttpStatus.CONFLICT)
+      .send(
+        this.generateResponse(HttpStatus.CONFLICT, 'Data already exists', data),
+      );
   }
   unauthorizedHelper(response: Response, data?: any): Response<any> {
-    return response.status(HttpStatus.UNAUTHORIZED).send({
-      success: false,
-      msg: 'Unauthorized',
-      data,
-      code: HttpStatus.UNAUTHORIZED,
-    });
+    return response
+      .status(HttpStatus.UNAUTHORIZED)
+      .send(
+        this.generateResponse(HttpStatus.UNAUTHORIZED, 'Unauthorized', data),
+      );
   }
 
   internalServerErrorWrapper(response: Response, error: any): Response<any> {
-    return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
-      success: false,
-      msg: 'Internal Server Error',
-      error,
-      code: HttpStatus.INTERNAL_SERVER_ERROR,
-    });
+    return response
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .send(
+        this.generateResponse(
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          'Internal Server Error',
+          { error },
+        ),
+      );
   }
   badRequestHelper(
     response: Response,
     error: any,
     message?: string,
   ): Response<any> {
-    return response.status(HttpStatus.BAD_REQUEST).send({
-      success: false,
-      msg: message || 'Bad Request',
-      error,
-      code: HttpStatus.BAD_REQUEST,
-    });
+    return response
+      .status(HttpStatus.BAD_REQUEST)
+      .send(this.generateResponse(HttpStatus.BAD_REQUEST, message, { error }));
   }
 }

@@ -6,7 +6,8 @@ import { Response } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import base64url from 'base64url';
-import { layout } from './layout/mail.layout';
+import { layout } from './layout/mail.layout';.
+import { envi } from 'src/config/envi';
 @Injectable()
 export class MailService {
   private readonly transporter;
@@ -15,10 +16,10 @@ export class MailService {
     private readonly prisma: PrismaService,
   ) {
     this.transporter = nodemailer.createTransport({
-      service: process.env.SERVICE,
+      service: envi.SERVICE,
       auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASS,
+        user: envi.EMAIL,
+        pass: envi.PASS,
       },
     });
   }

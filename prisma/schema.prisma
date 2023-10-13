@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -23,62 +23,6 @@ enum Status {
 }
 
 model User {
-  id        Int         @id @default(autoincrement())
-  nama      String      @unique
-  email     String      @unique
-  foto      String?
-  password  String?
-  role      Role
-  pemesanan Pemesanan[]
-  is_active Boolean     @default(false)
-  auth_code String
-}
-
-model Pemesanan {
-  id               Int                @id @default(autoincrement())
-  nomor            Int
-  nama_pemesan     String
-  email_pemesan    String
-  tgl_pemesanan    DateTime
-  tgl_check_in     DateTime
-  tgl_check_out    DateTime
-  nama_tamu        String
-  jumlah_kamar     Int
-  id_tipe_kamar    Int
-  status           Status
-  user             User?              @relation(fields: [user_id], references: [id])
-  user_id          Int
-  tipe_kamar       Tipe_Kamar         @relation(fields: [id_tipe_kamar], references: [id])
-  detail_pemesanan Detail_Pemesanan[]
-  Kamar            Kamar?             @relation(fields: [id_kamar], references: [id])
-  id_kamar         Int?
-}
-
-model Detail_Pemesanan {
-  id           Int        @id @default(autoincrement())
-  id_pemesanan Int
-  id_kamar     Int
-  tgl_akses    DateTime
-  harga        Int
-  kamar        Kamar?     @relation(fields: [id_kamar], references: [id])
-  pemesanan    Pemesanan? @relation(fields: [id_pemesanan], references: [id])
-}
-
-model Kamar {
-  id               Int                @id @default(autoincrement())
-  nomor            Int                @unique
-  id_tipe_kamar    Int
-  pemesanan        Pemesanan[]
-  detail_pemesanan Detail_Pemesanan[]
-  tipe_kamar       Tipe_Kamar         @relation(fields: [id_tipe_kamar], references: [id], onDelete: Cascade)
-}
-
-model Tipe_Kamar {
-  id        Int         @id @default(autoincrement())
-  nama      String
-  harga     Int
-  deskripsi String
-  foto      String
-  pemesanan Pemesanan[]
-  kamar     Kamar[]
+  id   Int    @unique @default(autoincrement())
+  uuid String @id @unique
 }
